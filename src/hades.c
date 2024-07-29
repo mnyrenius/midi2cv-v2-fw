@@ -14,6 +14,7 @@
 #include "mode_prio.h"
 #include "mode_midilearn.h"
 #include "mode_turing.h"
+#include "mode_menu.h"
 #include "constants.h"
 
 /* ---------- PIN CONFIGURATION ----------
@@ -83,26 +84,7 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
   mode_t *m = &cxt->modes[cxt->settings.mode];
 
   if (channel == 15) {
-    uint8_t k = note % 12;
-    switch (k) {
-      case 0: // c - mode note prio last
-        cxt->settings.mode = MODE_NOTE_PRIO_LAST;
-        break;
-      case 1: // c# - mode midi channel learn
-        cxt->settings.mode = MODE_MIDI_LEARN;
-        break;
-      case 2: // d - mode note prio high
-        cxt->settings.mode = MODE_NOTE_PRIO_HIGH;
-        break;
-      case 4: // e - mode note prio low
-        cxt->settings.mode = MODE_NOTE_PRIO_LOW;
-        break;
-      case 5: // f = mode turing machine
-        cxt->settings.mode = MODE_TURINGMACHINE;
-        break;
-      default:
-        break;
-    }
+        cxt->settings.mode = MODE_MENU;
     settings_write(&cxt->settings);
     __asm__("jmp 0"); // soft reset to reload settings
   } else if (channel == cxt->settings.midi_channel || cxt->settings.mode == MODE_MIDI_LEARN) {
@@ -175,11 +157,14 @@ int main()
     .out = &hades.out,
   };
 
-  hades.modes[MODE_NOTE_PRIO_LAST] = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio      };
-  hades.modes[MODE_NOTE_PRIO_HIGH] = hades.modes[MODE_NOTE_PRIO_LAST];
-  hades.modes[MODE_NOTE_PRIO_LOW]  = hades.modes[MODE_NOTE_PRIO_LAST];
+  mode_menu_t mode_menu = {
+    .settings = &hades.settings,
+  };
+
+  hades.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio      };
   hades.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn };
   hades.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing    };
+  hades.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu      };
 
   generate_dac_values(hades.dac_values);
   settings_read(&hades.settings);

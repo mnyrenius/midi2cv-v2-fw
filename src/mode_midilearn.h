@@ -9,4 +9,4 @@ typedef struct mode_midilearn_t {
 
 void mode_midilearn_event(mode_t *cxt, enum event ev);
 
-#endif /* MODE_MIDILEARN_H */ 
+#endif /* MODE_MIDILEARN_H */

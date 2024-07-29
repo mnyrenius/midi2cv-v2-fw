@@ -6,21 +6,7 @@
 
 void mode_init(mode_prio_t *cxt)
 {
-  enum notemem_prio prio = MODE_NOTE_PRIO_LAST;
-
-  switch(cxt->settings->mode) {
-    case MODE_NOTE_PRIO_LAST:
-      prio = NM_PRIO_LAST;
-      break;
-    case MODE_NOTE_PRIO_HIGH:
-      prio = NM_PRIO_HIGH;
-      break;
-    case MODE_NOTE_PRIO_LOW:
-      prio = NM_PRIO_LOW;
-      break;
-  }
-
-  notemem_init(cxt->notemem, prio);
+  notemem_init(cxt->notemem, NM_PRIO_LAST);
 }
 
 void mode_note_on(mode_prio_t *cxt, uint8_t note)

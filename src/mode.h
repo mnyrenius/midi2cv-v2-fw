@@ -17,12 +17,11 @@ enum event {
 };
 
 enum mode {
-  MODE_NOTE_PRIO_LAST,
-  MODE_NOTE_PRIO_HIGH,
-  MODE_NOTE_PRIO_LOW,
+  MODE_UNISON_LEGATO,
   MODE_MIDI_LEARN,
   MODE_TURINGMACHINE,
 
+  MODE_MENU,
   MODE_END
 };
 
@@ -33,6 +32,7 @@ typedef struct mode_t {
     struct mode_prio_t *prio_cxt;
     struct mode_midilearn_t *midilearn_cxt;
     struct mode_turing_t *turing_cxt;
+    struct mode_menu_t *menu_cxt;
   };
 } mode_t;
 
