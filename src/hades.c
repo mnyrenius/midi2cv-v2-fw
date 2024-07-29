@@ -84,7 +84,7 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
   mode_t *m = &cxt->modes[cxt->settings.mode];
 
   if (channel == 15) {
-        cxt->settings.mode = MODE_MENU;
+    cxt->settings.mode = MODE_MENU;
     settings_write(&cxt->settings);
     __asm__("jmp 0"); // soft reset to reload settings
   } else if (channel == cxt->settings.midi_channel || cxt->settings.mode == MODE_MIDI_LEARN) {
@@ -97,7 +97,6 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
 void note_off(void *arg, uint8_t channel, uint8_t note)
 {
   hades_t * cxt = (hades_t *)arg;
-
   if (channel == cxt->settings.midi_channel) {
     mode_t *m = &cxt->modes[cxt->settings.mode];
     m->channel = channel;
@@ -129,6 +128,10 @@ void stop(void *arg)
 
 int main()
 {
+  dac_init();
+  gate_init();
+  led_init();
+
   hades_t hades = {
     .out = {
       .cv = {0},
@@ -159,6 +162,7 @@ int main()
 
   mode_menu_t mode_menu = {
     .settings = &hades.settings,
+    .out = &hades.out,
   };
 
   hades.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio      };
@@ -183,9 +187,6 @@ int main()
 
   uint8_t rxb;
 
-  dac_init();
-  gate_init();
-  led_init();
   midi_init(&midi);
   uart_init();
 
@@ -194,7 +195,6 @@ int main()
   while (1) {
     if (uart_receive(&rxb) == 0)
       midi_process(&midi, rxb);
-
     m = &hades.modes[hades.settings.mode];
     m->event(m, EVENT_UPDATE);
 

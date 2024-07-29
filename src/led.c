@@ -31,7 +31,7 @@ void led_on(uint8_t index)
     break;
   }
 
-  PORTC |= _BV(pin);
+  PORTD |= _BV(pin);
 }
 
 void led_off(uint8_t index)
@@ -58,5 +58,5 @@ void led_off(uint8_t index)
     break;
   }
 
-  PORTC &= ~_BV(pin);
+  PORTD &= ~_BV(pin);
 }

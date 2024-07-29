@@ -4,6 +4,7 @@
 #include "led.h"
 #include <util/delay.h>
 #include "constants.h"
+#include <string.h>
 
 /* Settings menu
 
@@ -33,23 +34,30 @@ static void update_leds(uint8_t mode)
 static void mode_init(mode_menu_t *cxt)
 {
   cxt->menu_index = 0;
+  memset(cxt->out->updated, 0, NUM_CHANNELS);
   update_leds(cxt->menu_index);
 }
 
 static void mode_note_on(mode_menu_t *cxt, uint8_t note)
 {
-  if (note % 12 == 0) {
-    if (cxt->menu_index > 0)
-      cxt->menu_index--;
-    update_leds(cxt->menu_index);
-  } else if (note % 12 == 2) {
-    if (cxt->menu_index < 15)
-      cxt->menu_index++;
-    update_leds(cxt->menu_index);
-  } else if (note % 12 == 4) {
+  switch (note % 12) {
+    case 0:
+      if (cxt->menu_index > 0)
+        cxt->menu_index--;
+      update_leds(cxt->menu_index);
+      break;
+    case 2:
+      if (cxt->menu_index < 15)
+        cxt->menu_index++;
+      update_leds(cxt->menu_index);
+      break;
+    case 4:
       cxt->settings->mode = cxt->menu_index;
       settings_write(cxt->settings);
       __asm__("jmp 0"); // soft reset to reload settings
+      break;
+    default:
+      break;
   }
 }
 
