@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "dac.h"
 #include "uart.h"
+#include "gate.h"
+#include "led.h"
 #include "midi.h"
 #include "settings.h"
 #include "notemem.h"
@@ -145,20 +147,12 @@ void stop(void *arg)
 
 int main()
 {
-  // Setup gate and clock outputs
-  DDRC  |= _BV (PC0) | _BV (PC1) | _BV (PC2) | _BV (PC3) | _BV (PC4);
-  PORTC |= _BV (PC0) | _BV (PC1) | _BV (PC2) | _BV (PC3) | _BV (PC4);
-
-  // Setup leds
-  DDRD |= _BV (PD1) | _BV (PD2) | _BV (PD3) | _BV (PD4) | _BV (PD5);
-  PORTD &= ~ 0x3e;
-  TCCR1B = 0;
-
- hades_t hades = {
+  hades_t hades = {
     .out = {
-      .cv = 0,
-      .gate = 0,
-      .updated = 0,
+      .cv = {0},
+      .gates = {0},
+      .leds = {0},
+      .updated = {0},
     },
   };
 
@@ -205,6 +199,8 @@ int main()
   uint8_t rxb;
 
   dac_init();
+  gate_init();
+  led_init();
   midi_init(&midi);
   uart_init();
 
@@ -217,19 +213,26 @@ int main()
     m = &hades.modes[hades.settings.mode];
     m->event(m, EVENT_UPDATE);
 
-    if (hades.out.updated) {
-      dac_write(0, hades.out.cv);
+    for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
+      if (hades.out.updated[i]) {
+        dac_write(0, hades.out.cv[i]);
 
-      if (hades.out.gate) {
-        PORTC &= ~_BV(PC0);
-        PORTD |= _BV(PD4);
-      }
-      else {
-        PORTC |= _BV(PC0);
-        PORTD &= ~_BV(PD4);
-      }
+        if (hades.out.gates[i]) {
+          gate_on(i);
+        }
+        else {
+          gate_off(i);
+        }
 
-      hades.out.updated = 0;
+        if (hades.out.leds[i]) {
+          led_on(i);
+        }
+        else{
+          led_off(i);
+        }
+
+        hades.out.updated[i] = 0;
+      }
     }
   }
 }

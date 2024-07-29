@@ -2,6 +2,7 @@
 #include "notemem.h"
 #include "constants.h"
 #include "settings.h"
+#include <string.h>
 
 void mode_init(mode_prio_t *cxt)
 {
@@ -27,9 +28,13 @@ void mode_note_on(mode_prio_t *cxt, uint8_t note)
   if (note < NUM_NOTES) {
     uint8_t n = notemem_note_on(cxt->notemem, note);
     if (n < NUM_NOTES) {
-      cxt->out->cv = cxt->dac_values[n];
-      cxt->out->gate = 1;
-      cxt->out->updated = 1;
+      cxt->out->cv[0] = cxt->dac_values[n];
+      cxt->out->cv[1] = cxt->dac_values[n];
+      cxt->out->cv[2] = cxt->dac_values[n];
+      cxt->out->cv[3] = cxt->dac_values[n];
+      memset(cxt->out->gates, 1, NUM_CHANNELS);
+      memset(cxt->out->leds, 1, NUM_CHANNELS);
+      memset(cxt->out->updated, 1, NUM_CHANNELS);
     }
   }
 }
@@ -37,12 +42,18 @@ void mode_note_on(mode_prio_t *cxt, uint8_t note)
 void mode_note_off(mode_prio_t *cxt, uint8_t note)
 {
   uint8_t next = notemem_note_off(cxt->notemem, note);
-  if (next < NUM_NOTES)
-    cxt->out->cv = cxt->dac_values[next];
-  else
-    cxt->out->gate = 0;
+  if (next < NUM_NOTES) {
+    cxt->out->cv[0] = cxt->dac_values[next];
+    cxt->out->cv[1] = cxt->dac_values[next];
+    cxt->out->cv[2] = cxt->dac_values[next];
+    cxt->out->cv[3] = cxt->dac_values[next];
+  }
+  else {
+    memset(cxt->out->gates, 0, NUM_CHANNELS);
+    memset(cxt->out->leds, 0, NUM_CHANNELS);
+  }
 
-  cxt->out->updated = 1;
+  memset(cxt->out->updated, 1, NUM_CHANNELS);
 }
 
 void mode_prio_event(mode_t *cxt, enum event ev)

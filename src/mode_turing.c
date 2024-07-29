@@ -2,7 +2,8 @@
 #include "turing.h"
 #include "constants.h"
 #include "settings.h"
- 
+#include <string.h>
+
 static void mode_init(mode_turing_t *cxt)
 {
   turing_init(cxt->turing, 0);
@@ -44,15 +45,21 @@ static void mode_clock(mode_turing_t *cxt)
 
   if (cxt->clk_count == 0 || cxt->clk_count == 12) {
     uint8_t note = turing_clock(cxt->turing);
-    if (note < NUM_NOTES)
-      cxt->out->cv = cxt->dac_values[note];
-    cxt->out->gate = 1;
-    cxt->out->updated = 1;
+    if (note < NUM_NOTES) {
+      cxt->out->cv[0] = cxt->dac_values[note];
+      cxt->out->cv[1] = cxt->dac_values[note];
+      cxt->out->cv[2] = cxt->dac_values[note];
+      cxt->out->cv[3] = cxt->dac_values[note];
+    }
+    memset(cxt->out->gates, 1, NUM_CHANNELS);
+    memset(cxt->out->leds, 1, NUM_CHANNELS);
+    memset(cxt->out->updated, 1, NUM_CHANNELS);
   } else if (cxt->clk_count == 6 || cxt->clk_count == 18) {
-    cxt->out->gate = 0;
-    cxt->out->updated = 1;
+    memset(cxt->out->gates, 0, NUM_CHANNELS);
+    memset(cxt->out->leds, 0, NUM_CHANNELS);
+    memset(cxt->out->updated, 1, NUM_CHANNELS);
   }
- 
+
   if (cxt->clk_count++ >= 23) {
     cxt->clk_count = 0;
   }
