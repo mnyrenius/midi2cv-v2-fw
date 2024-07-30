@@ -1,5 +1,0 @@
-* Gate re-trigger mode
-  When this mode is selected, gate should always re-trigger on note on.
-
-* MIDI boot loader
-  It should be possible to update firmware via MIDI.
