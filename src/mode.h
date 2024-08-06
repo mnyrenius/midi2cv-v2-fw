@@ -20,7 +20,7 @@ enum mode {
   MODE_UNISON_LEGATO,
   MODE_MIDI_LEARN,
   MODE_TURINGMACHINE,
-
+  MODE_POLY_LEGATO,
   MODE_MENU,
   MODE_END
 };
@@ -33,6 +33,7 @@ typedef struct mode_t {
     struct mode_midilearn_t *midilearn_cxt;
     struct mode_turing_t *turing_cxt;
     struct mode_menu_t *menu_cxt;
+    struct mode_poly_t *poly_cxt;
   };
 } mode_t;
 

@@ -15,6 +15,7 @@
 #include "mode_midilearn.h"
 #include "mode_turing.h"
 #include "mode_menu.h"
+#include "mode_poly.h"
 #include "constants.h"
 
 /* ---------- PIN CONFIGURATION ----------
@@ -162,12 +163,19 @@ int main()
 
   mode_menu_t mode_menu = {
     .settings = &midi2cv.settings,
+  };
+
+  mode_poly_t mode_poly = {
+    .settings = &midi2cv.settings,
+    .notemem = &midi2cv.notemem,
+    .dac_values = midi2cv.dac_values,
     .out = &midi2cv.out,
   };
 
   midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio      };
   midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn };
   midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing    };
+  midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly       };
   midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu      };
 
   generate_dac_values(midi2cv.dac_values);
@@ -200,7 +208,7 @@ int main()
 
     for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
       if (midi2cv.out.updated[i]) {
-        dac_write(0, midi2cv.out.cv[i]);
+        dac_write(i, midi2cv.out.cv[i]);
 
         if (midi2cv.out.gates[i]) {
           gate_on(i);

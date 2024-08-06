@@ -13,6 +13,7 @@
    1 - Unison, legato, note prio last
    2 - Midi learn
    3 - Turing machine
+   4 - Polyphonic, legato
   15 - Menu
 
 */
@@ -34,7 +35,6 @@ static void update_leds(uint8_t mode)
 static void mode_init(mode_menu_t *cxt)
 {
   cxt->menu_index = 0;
-  memset(cxt->out->updated, 0, NUM_CHANNELS);
   update_leds(cxt->menu_index);
 }
 

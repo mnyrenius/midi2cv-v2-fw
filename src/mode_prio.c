@@ -4,12 +4,12 @@
 #include "settings.h"
 #include <string.h>
 
-void mode_init(mode_prio_t *cxt)
+static void mode_init(mode_prio_t *cxt)
 {
   notemem_init(cxt->notemem, NM_PRIO_LAST);
 }
 
-void mode_note_on(mode_prio_t *cxt, uint8_t note)
+static void mode_note_on(mode_prio_t *cxt, uint8_t note)
 {
   if (note < NUM_NOTES) {
     uint8_t n = notemem_note_on(cxt->notemem, note);
@@ -25,7 +25,7 @@ void mode_note_on(mode_prio_t *cxt, uint8_t note)
   }
 }
 
-void mode_note_off(mode_prio_t *cxt, uint8_t note)
+static void mode_note_off(mode_prio_t *cxt, uint8_t note)
 {
   uint8_t next = notemem_note_off(cxt->notemem, note);
   if (next < NUM_NOTES) {
