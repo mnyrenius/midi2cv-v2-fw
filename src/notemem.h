@@ -19,6 +19,7 @@
 
 typedef struct node_t {
   uint8_t note;
+  uint8_t channel;
   struct node_t *next;
 } node_t;
 

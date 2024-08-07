@@ -11,11 +11,4 @@
 
 #define UBRR_CONF UBRR_31250B
 
-typedef struct output_t {
-  uint16_t cv[NUM_CHANNELS];
-  uint8_t gates[NUM_CHANNELS];
-  uint8_t leds[NUM_CHANNELS];
-  uint8_t updated[NUM_CHANNELS];
-} output_t;
-
 #endif /* CONSTANTS_H */

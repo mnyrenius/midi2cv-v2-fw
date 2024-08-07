@@ -2,7 +2,9 @@
 #include "turing.h"
 #include "constants.h"
 #include "settings.h"
-#include <string.h>
+#include "dac.h"
+#include "gate.h"
+#include "led.h"
 
 static void mode_init(mode_turing_t *cxt)
 {
@@ -46,18 +48,17 @@ static void mode_clock(mode_turing_t *cxt)
   if (cxt->clk_count == 0 || cxt->clk_count == 12) {
     uint8_t note = turing_clock(cxt->turing);
     if (note < NUM_NOTES) {
-      cxt->out->cv[0] = cxt->dac_values[note];
-      cxt->out->cv[1] = cxt->dac_values[note];
-      cxt->out->cv[2] = cxt->dac_values[note];
-      cxt->out->cv[3] = cxt->dac_values[note];
+      for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
+        dac_write(i, cxt->dac_values[note]);
+        gate_on(i);
+        led_on(i);
+      }
     }
-    memset(cxt->out->gates, 1, NUM_CHANNELS);
-    memset(cxt->out->leds, 1, NUM_CHANNELS);
-    memset(cxt->out->updated, 1, NUM_CHANNELS);
   } else if (cxt->clk_count == 6 || cxt->clk_count == 18) {
-    memset(cxt->out->gates, 0, NUM_CHANNELS);
-    memset(cxt->out->leds, 0, NUM_CHANNELS);
-    memset(cxt->out->updated, 1, NUM_CHANNELS);
+      for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
+        gate_off(i);
+        led_off(i);
+      }
   }
 
   if (cxt->clk_count++ >= 23) {

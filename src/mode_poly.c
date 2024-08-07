@@ -1,35 +1,42 @@
 #include "mode_poly.h"
-#include "notemem.h"
 #include "constants.h"
 #include "settings.h"
-#include <string.h>
+#include "dac.h"
+#include "gate.h"
+#include "led.h"
 
 static void mode_init(mode_poly_t *cxt)
 {
-  notemem_init(cxt->notemem, NM_PRIO_LAST);
   cxt->next_channel = 0;
 }
 
 static void mode_note_on(mode_poly_t *cxt, uint8_t note)
 {
   if (note < NUM_NOTES) {
-    uint8_t n = notemem_note_on(cxt->notemem, note);
-    if (n < NUM_NOTES) {
+    if (cxt->next_channel < NUM_CHANNELS) {
+      dac_write(cxt->next_channel, cxt->dac_values[note]);
+      if (cxt->retrig) {
+        for (uint8_t i = 0; i < cxt->next_channel; ++i) {
+          gate_off(i);
+        }
+        for (uint8_t i = 0; i < cxt->next_channel; ++i) {
+          gate_on(i);
+        }
+      }
+      gate_on(cxt->next_channel);
+      led_on(cxt->next_channel);
+      cxt->next_channel++;
     }
   }
 }
 
 static void mode_note_off(mode_poly_t *cxt, uint8_t note)
 {
-  uint8_t next = notemem_note_off(cxt->notemem, note);
-  if (next < NUM_NOTES) {
+  if (note < NUM_NOTES && cxt->next_channel > 0) {
+    cxt->next_channel--;
+    gate_off(cxt->next_channel);
+    led_off(cxt->next_channel);
   }
-  else {
-    memset(cxt->out->gates, 0, NUM_CHANNELS);
-    memset(cxt->out->leds, 0, NUM_CHANNELS);
-  }
-
-  memset(cxt->out->updated, 1, NUM_CHANNELS);
 }
 
 void mode_poly_event(mode_t *cxt, enum event ev)

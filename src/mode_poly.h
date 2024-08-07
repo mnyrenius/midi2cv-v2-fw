@@ -5,9 +5,8 @@
 
 typedef struct mode_poly_t {
   struct settings_t *settings;
-  struct notemem_t *notemem;
+  uint8_t retrig;
   uint16_t *dac_values;
-  struct output_t *out;
   uint8_t next_channel;
 } mode_poly_t;
 

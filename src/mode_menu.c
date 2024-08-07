@@ -14,6 +14,7 @@
    2 - Midi learn
    3 - Turing machine
    4 - Polyphonic, legato
+   5 - Polyphonic, retrig
   15 - Menu
 
 */
@@ -34,7 +35,7 @@ static void update_leds(uint8_t mode)
 
 static void mode_init(mode_menu_t *cxt)
 {
-  cxt->menu_index = 0;
+  cxt->menu_index = cxt->settings->mode;
   update_leds(cxt->menu_index);
 }
 

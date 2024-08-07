@@ -59,7 +59,6 @@ typedef struct midi2cv_t {
   turing_t turing;
   uint16_t dac_values[NUM_NOTES];
   mode_t modes[MODE_END];
-  output_t out;
 } midi2cv_t;
 
 void generate_dac_values(uint16_t *values)
@@ -133,20 +132,12 @@ int main()
   gate_init();
   led_init();
 
-  midi2cv_t midi2cv = {
-    .out = {
-      .cv = {0},
-      .gates = {0},
-      .leds = {0},
-      .updated = {0},
-    },
-  };
+  midi2cv_t midi2cv;
 
   mode_prio_t mode_prio = {
     .settings = &midi2cv.settings,
     .notemem = &midi2cv.notemem,
     .dac_values = midi2cv.dac_values,
-    .out = &midi2cv.out,
   };
 
   mode_midilearn_t mode_midilearn = {
@@ -158,25 +149,30 @@ int main()
     .settings = &midi2cv.settings,
     .turing = &midi2cv.turing,
     .dac_values = midi2cv.dac_values,
-    .out = &midi2cv.out,
   };
 
   mode_menu_t mode_menu = {
     .settings = &midi2cv.settings,
   };
 
-  mode_poly_t mode_poly = {
+  mode_poly_t mode_poly_legato = {
     .settings = &midi2cv.settings,
-    .notemem = &midi2cv.notemem,
     .dac_values = midi2cv.dac_values,
-    .out = &midi2cv.out,
+    .retrig  = 0,
   };
 
-  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio      };
-  midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn };
-  midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing    };
-  midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly       };
-  midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu      };
+  mode_poly_t mode_poly_retrig = {
+    .settings = &midi2cv.settings,
+    .dac_values = midi2cv.dac_values,
+    .retrig  = 1,
+  };
+
+  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio        };
+  midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn   };
+  midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing      };
+  midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_legato };
+  midi2cv.modes[MODE_POLY_RETRIG]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_retrig };
+  midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu        };
 
   generate_dac_values(midi2cv.dac_values);
   settings_read(&midi2cv.settings);
@@ -203,29 +199,5 @@ int main()
   while (1) {
     if (uart_receive(&rxb) == 0)
       midi_process(&midi, rxb);
-    m = &midi2cv.modes[midi2cv.settings.mode];
-    m->event(m, EVENT_UPDATE);
-
-    for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
-      if (midi2cv.out.updated[i]) {
-        dac_write(i, midi2cv.out.cv[i]);
-
-        if (midi2cv.out.gates[i]) {
-          gate_on(i);
-        }
-        else {
-          gate_off(i);
-        }
-
-        if (midi2cv.out.leds[i]) {
-          led_on(i);
-        }
-        else{
-          led_off(i);
-        }
-
-        midi2cv.out.updated[i] = 0;
-      }
-    }
   }
 }
