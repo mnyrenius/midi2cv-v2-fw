@@ -16,6 +16,10 @@ static void mode_note_on(mode_prio_t *cxt, uint8_t note)
   if (note < NUM_NOTES) {
     uint8_t n = notemem_note_on(cxt->notemem, note);
     if (n < NUM_NOTES) {
+      if (cxt->retrig) {
+        for (uint8_t i = 0; i < NUM_CHANNELS; ++i)
+          gate_off(i);
+      }
       for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
         dac_write(i, cxt->dac_values[n]);
         gate_on(i);

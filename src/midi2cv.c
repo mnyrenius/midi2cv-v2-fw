@@ -134,10 +134,18 @@ int main()
 
   midi2cv_t midi2cv;
 
-  mode_prio_t mode_prio = {
+  mode_prio_t mode_prio_legato = {
     .settings = &midi2cv.settings,
     .notemem = &midi2cv.notemem,
     .dac_values = midi2cv.dac_values,
+    .retrig = 0,
+  };
+
+  mode_prio_t mode_prio_retrig = {
+    .settings = &midi2cv.settings,
+    .notemem = &midi2cv.notemem,
+    .dac_values = midi2cv.dac_values,
+    .retrig = 1,
   };
 
   mode_midilearn_t mode_midilearn = {
@@ -167,7 +175,8 @@ int main()
     .retrig  = 1,
   };
 
-  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio        };
+  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio_legato };
+  midi2cv.modes[MODE_UNISON_RETRIG]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio_retrig };
   midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn   };
   midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing      };
   midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_legato };
