@@ -47,31 +47,15 @@ static void mode_note_on(mode_share_t *cxt, uint8_t note)
 
 static void mode_note_off(mode_share_t *cxt, uint8_t note)
 {
-  if (note < NUM_NOTES) {
+  if (note < NUM_NOTES && cxt->num_pressed > 0) {
     cxt->num_pressed--;
-    switch (cxt->num_pressed) {
-      case 1:
-        cxt->notes[1] = cxt->notes[0];
-        cxt->notes[2] = cxt->notes[0];
-        cxt->notes[3] = cxt->notes[0];
-        break;
-      case 2:
-        cxt->notes[2] = cxt->notes[1];
-        cxt->notes[3] = cxt->notes[1];
-        cxt->notes[1] = cxt->notes[0];
-        break;
-      case 3:
-        cxt->notes[3] = cxt->notes[2];
-        break;
-      default:
-        break;
-    }
-    for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
-      if (cxt->num_pressed == 0) {
+    gate_off(cxt->num_pressed);
+    led_off(cxt->num_pressed);
+    if (cxt->num_pressed == 0) {
+      for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
         gate_off(i);
         led_off(i);
       }
-      dac_write(i, cxt->dac_values[cxt->notes[i]]);
     }
   }
 }
