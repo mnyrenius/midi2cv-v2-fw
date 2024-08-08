@@ -16,6 +16,7 @@
 #include "mode_turing.h"
 #include "mode_menu.h"
 #include "mode_poly.h"
+#include "mode_share.h"
 #include "constants.h"
 
 /* ---------- PIN CONFIGURATION ----------
@@ -63,15 +64,6 @@ typedef struct midi2cv_t {
 
 void generate_dac_values(uint16_t *values)
 {
-  // v_out = v_ref * d / 4096
-  // 1 volt is = 819 which gives 819 / 12 = 68.25 per
-  // semi note. since we need an integer, multiply by 4 -> 273 and
-  // use this as the step between each note.
-  // finally divide each note value by 4 to get the real dac value again and it
-  // should hopefully be quite close to 1v/oct.
-  //for (uint8_t i = 0; i < NUM_NOTES; ++i)
-  //  values[i] = MIN(NUM_DAC_VALUES - 1, 273 * i / 4);
-
   for (uint16_t i = 0; i < NUM_NOTES; ++i)
   {
     values[i] = 4096 - 38 * i;
@@ -175,12 +167,19 @@ int main()
     .retrig  = 1,
   };
 
+  mode_share_t mode_share = {
+    .settings = &midi2cv.settings,
+    .dac_values = midi2cv.dac_values,
+  };
+
+
   midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio_legato };
   midi2cv.modes[MODE_UNISON_RETRIG]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio_retrig };
   midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn   };
   midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing      };
   midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_legato };
   midi2cv.modes[MODE_POLY_RETRIG]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_retrig };
+  midi2cv.modes[MODE_SHARE]          = (mode_t) { .event = mode_share_event      , .share_cxt     = &mode_share       };
   midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu        };
 
   generate_dac_values(midi2cv.dac_values);

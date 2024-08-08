@@ -11,10 +11,12 @@
   Gate leds forms a binary number 1-15 that represent a mode (top led = MSB).
 
    1 - Unison, legato, note prio last
-   2 - Midi learn
-   3 - Turing machine
-   4 - Polyphonic, legato
-   5 - Polyphonic, retrig
+   2 - Unison, retrig, note prio last
+   3 - Midi learn
+   4 - Turing machine
+   5 - Polyphonic, legato
+   6 - Polyphonic, retrig
+   7 - Unison/share, legato
   15 - Menu
 
 */

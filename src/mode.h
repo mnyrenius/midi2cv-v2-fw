@@ -22,6 +22,7 @@ enum mode {
   MODE_TURINGMACHINE,
   MODE_POLY_LEGATO,
   MODE_POLY_RETRIG,
+  MODE_SHARE,
   MODE_MENU,
   MODE_END
 };
@@ -35,6 +36,7 @@ typedef struct mode_t {
     struct mode_turing_t *turing_cxt;
     struct mode_menu_t *menu_cxt;
     struct mode_poly_t *poly_cxt;
+    struct mode_share_t *share_cxt;
   };
 } mode_t;
 
