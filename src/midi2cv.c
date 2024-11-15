@@ -11,12 +11,13 @@
 #include "notemem.h"
 #include "turing.h"
 #include "mode.h"
-#include "mode_prio.h"
+#include "mode_unison.h"
 #include "mode_midilearn.h"
 #include "mode_turing.h"
 #include "mode_menu.h"
 #include "mode_poly.h"
 #include "mode_share.h"
+#include "mode_mono.h"
 #include "constants.h"
 
 /* ---------- PIN CONFIGURATION ----------
@@ -127,14 +128,14 @@ int main()
 
   midi2cv_t midi2cv;
 
-  mode_prio_t mode_prio_legato = {
+  mode_unison_t mode_unison_legato = {
     .settings = &midi2cv.settings,
     .notemem = &midi2cv.notemem,
     .dac_values = midi2cv.dac_values,
     .retrig = 0,
   };
 
-  mode_prio_t mode_prio_retrig = {
+  mode_unison_t mode_unison_retrig = {
     .settings = &midi2cv.settings,
     .notemem = &midi2cv.notemem,
     .dac_values = midi2cv.dac_values,
@@ -173,14 +174,19 @@ int main()
     .dac_values = midi2cv.dac_values,
   };
 
+  mode_mono_t mode_mono = {
+    .settings = &midi2cv.settings,
+    .dac_values = midi2cv.dac_values,
+  };
 
-  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio_legato };
-  midi2cv.modes[MODE_UNISON_RETRIG]  = (mode_t) { .event = mode_prio_event       , .prio_cxt      = &mode_prio_retrig };
+  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_legato };
+  midi2cv.modes[MODE_UNISON_RETRIG]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_retrig };
   midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn   };
   midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing      };
   midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_legato };
   midi2cv.modes[MODE_POLY_RETRIG]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_retrig };
   midi2cv.modes[MODE_SHARE]          = (mode_t) { .event = mode_share_event      , .share_cxt     = &mode_share       };
+  midi2cv.modes[MODE_MONO]           = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono        };
   midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu        };
 
   generate_dac_values(midi2cv.dac_values);

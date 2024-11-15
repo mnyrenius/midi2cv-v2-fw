@@ -23,6 +23,7 @@ enum mode {
   MODE_POLY_LEGATO,
   MODE_POLY_RETRIG,
   MODE_SHARE,
+  MODE_MONO,
   MODE_MENU,
   MODE_END
 };
@@ -31,12 +32,13 @@ typedef struct mode_t {
   void (*event)(struct mode_t*, enum event);
   uint8_t base_channel, channel, note;
   union {
-    struct mode_prio_t *prio_cxt;
+    struct mode_unison_t *unison_cxt;
     struct mode_midilearn_t *midilearn_cxt;
     struct mode_turing_t *turing_cxt;
     struct mode_menu_t *menu_cxt;
     struct mode_poly_t *poly_cxt;
     struct mode_share_t *share_cxt;
+    struct mode_mono_t *mono_cxt;
   };
 } mode_t;
 
