@@ -6,43 +6,52 @@
 #include "gate.h"
 #include "led.h"
 
+#define CLOCK_PIN 4
+
 static void mode_init(mode_prio_t *cxt)
 {
   notemem_init(cxt->notemem, NM_PRIO_LAST);
 }
 
-static void mode_note_on(mode_prio_t *cxt, uint8_t note)
+static uint8_t is_for_me(uint8_t base_channel, uint8_t channel)
+{
+  return (channel >= base_channel && channel < (base_channel + NUM_CHANNELS));
+}
+
+static void mode_note_on(mode_prio_t *cxt, uint8_t note, uint8_t channel)
 {
   if (note < NUM_NOTES) {
     uint8_t n = notemem_note_on(cxt->notemem, note);
     if (n < NUM_NOTES) {
       if (cxt->retrig) {
-        for (uint8_t i = 0; i < NUM_CHANNELS; ++i)
-          gate_off(i);
+        gate_off(channel);
       }
-      for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
-        dac_write(i, cxt->dac_values[n]);
-        gate_on(i);
-        led_on(i);
-      }
+
+      dac_write(channel, cxt->dac_values[n]);
+      gate_on(channel);
+      led_on(channel);
     }
   }
 }
 
-static void mode_note_off(mode_prio_t *cxt, uint8_t note)
+static void mode_note_off(mode_prio_t *cxt, uint8_t note, uint8_t channel)
 {
   uint8_t next = notemem_note_off(cxt->notemem, note);
   if (next < NUM_NOTES) {
-    for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
-      dac_write(i, cxt->dac_values[next]);
-    }
+    dac_write(channel, cxt->dac_values[next]);
   }
   else {
-    for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
-      gate_off(i);
-      led_off(i);
-    }
+    gate_off(channel);
+    led_off(channel);
   }
+}
+
+static void mode_clock(mode_prio_t *cxt)
+{
+  gate_on(CLOCK_PIN);
+  led_on(CLOCK_PIN);
+  gate_off(CLOCK_PIN);
+  led_off(CLOCK_PIN);
 }
 
 void mode_prio_event(mode_t *cxt, enum event ev)
@@ -52,10 +61,17 @@ void mode_prio_event(mode_t *cxt, enum event ev)
       mode_init(cxt->prio_cxt);
       break;
     case EVENT_NOTE_ON:
-      mode_note_on(cxt->prio_cxt, cxt->note);
+      if (is_for_me(cxt->base_channel, cxt->channel)) {
+        mode_note_on(cxt->prio_cxt, cxt->note, cxt->channel);
+      }
       break;
     case EVENT_NOTE_OFF:
-      mode_note_off(cxt->prio_cxt, cxt->note);
+      if (is_for_me(cxt->base_channel, cxt->channel)) {
+        mode_note_off(cxt->prio_cxt, cxt->note, cxt->channel);
+      }
+      break;
+    case EVENT_RT_CLOCK:
+      mode_clock(cxt->prio_cxt);
       break;
     default:
       break;

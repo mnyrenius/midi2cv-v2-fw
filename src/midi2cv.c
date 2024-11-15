@@ -79,7 +79,7 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
     cxt->settings.mode = MODE_MENU;
     settings_write(&cxt->settings);
     __asm__("jmp 0"); // soft reset to reload settings
-  } else if (channel == cxt->settings.midi_channel || cxt->settings.mode == MODE_MIDI_LEARN) {
+  } else {
     m->channel = channel;
     m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
     m->event(m, EVENT_NOTE_ON);
@@ -91,6 +91,7 @@ void note_off(void *arg, uint8_t channel, uint8_t note)
   midi2cv_t * cxt = (midi2cv_t *)arg;
   if (channel == cxt->settings.midi_channel) {
     mode_t *m = &cxt->modes[cxt->settings.mode];
+    m->base_channel = cxt->settings.midi_channel;
     m->channel = channel;
     m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
     m->event(m, EVENT_NOTE_OFF);
