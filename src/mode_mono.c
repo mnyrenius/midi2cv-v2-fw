@@ -11,6 +11,7 @@
 static void mode_init(mode_mono_t *cxt)
 {
   notemem_init(cxt->notemem, NM_PRIO_LAST);
+  cxt->clock_counter = 0;
 }
 
 static uint8_t is_for_me(uint8_t base_channel, uint8_t channel)
@@ -48,10 +49,28 @@ static void mode_note_off(mode_mono_t *cxt, uint8_t note, uint8_t channel)
 
 static void mode_clock(mode_mono_t *cxt)
 {
-  gate_on(CLOCK_PIN);
-  led_on(CLOCK_PIN);
-  gate_off(CLOCK_PIN);
-  led_off(CLOCK_PIN);
+  if (cxt->clock_running) {
+    cxt->clock_counter++;
+    if (cxt->clock_counter == 12)
+    {
+      gate_on(CLOCK_PIN);
+      led_on(CLOCK_PIN);
+      gate_off(CLOCK_PIN);
+      led_off(CLOCK_PIN);
+      cxt->clock_counter = 0;
+    }
+  }
+}
+
+static void mode_start(mode_mono_t *cxt)
+{
+  cxt->clock_running = 1;
+}
+
+static void mode_stop(mode_mono_t *cxt)
+{
+  cxt->clock_running = 0;
+  cxt->clock_counter = 0;
 }
 
 void mode_mono_event(mode_t *cxt, enum event ev)
@@ -72,6 +91,12 @@ void mode_mono_event(mode_t *cxt, enum event ev)
       break;
     case EVENT_RT_CLOCK:
       mode_clock(cxt->mono_cxt);
+      break;
+    case EVENT_RT_START:
+      mode_start(cxt->mono_cxt);
+      break;
+    case EVENT_RT_STOP:
+      mode_stop(cxt->mono_cxt);
       break;
     default:
       break;
