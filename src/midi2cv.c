@@ -77,6 +77,7 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
   mode_t *m = &cxt->modes[cxt->settings.mode];
 
   if (channel == 15) {
+    cxt->settings.mode_prev = cxt->settings.mode;
     cxt->settings.mode = MODE_MENU;
     settings_write(&cxt->settings);
     __asm__("jmp 0"); // soft reset to reload settings

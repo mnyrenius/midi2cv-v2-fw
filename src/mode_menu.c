@@ -37,7 +37,7 @@ static void update_leds(uint8_t mode)
 
 static void mode_init(mode_menu_t *cxt)
 {
-  cxt->menu_index = cxt->settings->mode;
+  cxt->menu_index = cxt->settings->mode_prev;
   update_leds(cxt->menu_index);
 }
 
