@@ -91,13 +91,11 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
 void note_off(void *arg, uint8_t channel, uint8_t note)
 {
   midi2cv_t * cxt = (midi2cv_t *)arg;
-  if (channel == cxt->settings.midi_channel) {
-    mode_t *m = &cxt->modes[cxt->settings.mode];
-    m->base_channel = cxt->settings.midi_channel;
-    m->channel = channel;
-    m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
-    m->event(m, EVENT_NOTE_OFF);
-  }
+  mode_t *m = &cxt->modes[cxt->settings.mode];
+  m->base_channel = cxt->settings.midi_channel;
+  m->channel = channel;
+  m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
+  m->event(m, EVENT_NOTE_OFF);
 }
 
 void clock(void *arg)
@@ -177,6 +175,7 @@ int main()
 
   mode_mono_t mode_mono = {
     .settings = &midi2cv.settings,
+    .notemem = &midi2cv.notemem,
     .dac_values = midi2cv.dac_values,
   };
 
