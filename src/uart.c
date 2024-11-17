@@ -14,7 +14,8 @@ void uart_init(void)
   UBRR0 = UBRR_CONF;
 
   UCSR0C = _BV(UCSZ01) | _BV(UCSZ00);
-  UCSR0B = _BV(RXEN0)  | _BV (TXEN0) | _BV(RXCIE0);
+  // TX not enabled since pin is used for clock led...
+  UCSR0B = _BV(RXEN0) | _BV(RXCIE0);
 }
 
 int uart_receive(uint8_t * data)

@@ -13,7 +13,6 @@ static void mode_init(mode_mono_t *cxt)
   notemem_init(cxt->notemem, NM_PRIO_LAST);
   cxt->clock_counter = 0;
   cxt->clock_running = 0;
-  led_off(CLOCK_PIN);
 }
 
 static uint8_t is_for_me(uint8_t base_channel, uint8_t channel)
