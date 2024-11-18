@@ -23,14 +23,15 @@ enum mode {
   MODE_POLY_LEGATO,
   MODE_POLY_RETRIG,
   MODE_SHARE,
-  MODE_MONO,
+  MODE_MONO_LEGATO,
+  MODE_MONO_RETRIG,
   MODE_MENU,
   MODE_END
 };
 
 typedef struct mode_t {
   void (*event)(struct mode_t*, enum event);
-  uint8_t base_channel, channel, note;
+  uint8_t channel, note;
   union {
     struct mode_unison_t *unison_cxt;
     struct mode_midilearn_t *midilearn_cxt;

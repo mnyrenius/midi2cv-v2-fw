@@ -92,7 +92,6 @@ void note_off(void *arg, uint8_t channel, uint8_t note)
 {
   midi2cv_t * cxt = (midi2cv_t *)arg;
   mode_t *m = &cxt->modes[cxt->settings.mode];
-  m->base_channel = cxt->settings.midi_channel;
   m->channel = channel;
   m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
   m->event(m, EVENT_NOTE_OFF);
@@ -173,10 +172,18 @@ int main()
     .dac_values = midi2cv.dac_values,
   };
 
-  mode_mono_t mode_mono = {
+  mode_mono_t mode_mono_legato = {
     .settings = &midi2cv.settings,
     .notemem = &midi2cv.notemem,
     .dac_values = midi2cv.dac_values,
+    .retrig = 0,
+  };
+
+  mode_mono_t mode_mono_retrig = {
+    .settings = &midi2cv.settings,
+    .notemem = &midi2cv.notemem,
+    .dac_values = midi2cv.dac_values,
+    .retrig = 1,
   };
 
   midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_legato };
@@ -186,7 +193,8 @@ int main()
   midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_legato };
   midi2cv.modes[MODE_POLY_RETRIG]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_retrig };
   midi2cv.modes[MODE_SHARE]          = (mode_t) { .event = mode_share_event      , .share_cxt     = &mode_share       };
-  midi2cv.modes[MODE_MONO]           = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono        };
+  midi2cv.modes[MODE_MONO_LEGATO]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_legato };
+  midi2cv.modes[MODE_MONO_RETRIG]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_retrig };
   midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu        };
 
   generate_dac_values(midi2cv.dac_values);

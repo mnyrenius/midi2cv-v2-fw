@@ -18,6 +18,7 @@
    6 - Polyphonic, retrig
    7 - Unison/share, legato
    8 - Mono, legato, 4 channels
+   9 - Mono, retrig, 4 channels
   15 - Menu
 
 */

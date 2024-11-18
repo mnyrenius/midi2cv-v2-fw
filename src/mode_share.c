@@ -72,12 +72,12 @@ void mode_share_event(mode_t *cxt, enum event ev)
       mode_init(cxt->share_cxt);
       break;
     case EVENT_NOTE_ON:
-      if (is_for_me(cxt->base_channel, cxt->channel)) {
+      if (is_for_me(cxt->share_cxt->settings->midi_channel, cxt->channel)) {
         mode_note_on(cxt->share_cxt, cxt->note);
       }
       break;
     case EVENT_NOTE_OFF:
-      if (is_for_me(cxt->base_channel, cxt->channel)) {
+      if (is_for_me(cxt->share_cxt->settings->midi_channel, cxt->channel)) {
         mode_note_off(cxt->share_cxt, cxt->note);
       }
       break;

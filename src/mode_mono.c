@@ -75,12 +75,12 @@ void mode_mono_event(mode_t *cxt, enum event ev)
       mode_init(cxt->mono_cxt);
       break;
     case EVENT_NOTE_ON:
-      if (is_for_me(cxt->base_channel, cxt->channel)) {
+      if (is_for_me(cxt->mono_cxt->settings->midi_channel, cxt->channel)) {
         mode_note_on(cxt->mono_cxt, cxt->note, cxt->channel);
       }
       break;
     case EVENT_NOTE_OFF:
-      if (is_for_me(cxt->base_channel, cxt->channel)) {
+      if (is_for_me(cxt->mono_cxt->settings->midi_channel, cxt->channel)) {
         mode_note_off(cxt->mono_cxt, cxt->note, cxt->channel);
       }
       break;

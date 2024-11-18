@@ -57,12 +57,12 @@ void mode_unison_event(mode_t *cxt, enum event ev)
       mode_init(cxt->unison_cxt);
       break;
     case EVENT_NOTE_ON:
-      if (is_for_me(cxt->base_channel, cxt->channel)) {
+      if (is_for_me(cxt->unison_cxt->settings->midi_channel, cxt->channel)) {
         mode_note_on(cxt->unison_cxt, cxt->note);
       }
       break;
     case EVENT_NOTE_OFF:
-      if (is_for_me(cxt->base_channel, cxt->channel)) {
+      if (is_for_me(cxt->unison_cxt->settings->midi_channel, cxt->channel)) {
         mode_note_off(cxt->unison_cxt, cxt->note);
       }
       break;
