@@ -82,8 +82,8 @@ void update_enter_menu(midi2cv_t *cxt, uint8_t note)
 {
   menu_enter_t *p = &cxt->menu_enter;
 
-  if (p->idx < 2) {
-    p->notes[++p->idx] = note;
+  if (p->idx < 3) {
+    p->notes[p->idx++] = note;
   }
 }
 
@@ -92,7 +92,7 @@ bool should_enter_menu(midi2cv_t *cxt)
   menu_enter_t *p = &cxt->menu_enter;
 
   bool enter_menu = false;
-  if (p->idx == 2) {
+  if (p->idx == 3) {
     // Enter menu if pressing c#, d# and a#
     if (p->notes[0] % 12 == 1 && p->notes[1] % 12 == 3 && p->notes[2] % 12 == 10) {
       enter_menu = true;
