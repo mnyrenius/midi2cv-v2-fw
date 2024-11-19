@@ -2,6 +2,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "dac.h"
 #include "uart.h"
 #include "gate.h"
@@ -55,12 +56,18 @@
  *
  * ------------------------------------ */
 
+typedef struct menu_enter_t {
+  uint8_t idx;
+  uint8_t notes[3];
+} menu_enter_t;
+
 typedef struct midi2cv_t {
   settings_t settings;
   notemem_t notemem;
   turing_t turing;
   uint16_t dac_values[NUM_NOTES];
   mode_t modes[MODE_END];
+  menu_enter_t menu_enter;
 } midi2cv_t;
 
 void generate_dac_values(uint16_t *values)
@@ -71,12 +78,38 @@ void generate_dac_values(uint16_t *values)
   }
 }
 
+void update_enter_menu(midi2cv_t *cxt, uint8_t note)
+{
+  menu_enter_t *p = &cxt->menu_enter;
+
+  if (p->idx < 2) {
+    p->notes[++p->idx] = note;
+  }
+}
+
+bool should_enter_menu(midi2cv_t *cxt)
+{
+  menu_enter_t *p = &cxt->menu_enter;
+
+  bool enter_menu = false;
+  if (p->idx == 2) {
+    // Enter menu if pressing c#, d# and a#
+    if (p->notes[0] % 12 == 1 && p->notes[1] % 12 == 3 && p->notes[2] % 12 == 10) {
+      enter_menu = true;
+    }
+  }
+
+  return enter_menu;
+}
+
 void note_on(void *arg, uint8_t channel, uint8_t note)
 {
   midi2cv_t * cxt = (midi2cv_t *)arg;
   mode_t *m = &cxt->modes[cxt->settings.mode];
 
-  if (channel == 15) {
+  update_enter_menu(cxt, note);
+
+  if (should_enter_menu(cxt)) {
     cxt->settings.mode_prev = cxt->settings.mode;
     cxt->settings.mode = MODE_MENU;
     settings_write(&cxt->settings);
@@ -91,6 +124,11 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
 void note_off(void *arg, uint8_t channel, uint8_t note)
 {
   midi2cv_t * cxt = (midi2cv_t *)arg;
+
+  if (cxt->menu_enter.idx > 0) {
+    cxt->menu_enter.idx--;
+  }
+
   mode_t *m = &cxt->modes[cxt->settings.mode];
   m->channel = channel;
   m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
@@ -199,6 +237,7 @@ int main()
 
   generate_dac_values(midi2cv.dac_values);
   settings_read(&midi2cv.settings);
+  midi2cv.menu_enter.idx = 0;
 
   mode_t *m = &midi2cv.modes[midi2cv.settings.mode];
   m->event(m, EVENT_INIT);
