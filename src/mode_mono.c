@@ -15,11 +15,6 @@ static void mode_init(mode_mono_t *cxt)
   cxt->clock_running = 0;
 }
 
-static uint8_t is_for_me(uint8_t base_channel, uint8_t channel)
-{
-  return (channel >= base_channel && channel < (base_channel + NUM_CHANNELS));
-}
-
 static void mode_note_on(mode_mono_t *cxt, uint8_t note, uint8_t channel)
 {
   uint8_t rel_channel = channel - cxt->settings->midi_channel;
@@ -75,14 +70,10 @@ void mode_mono_event(mode_t *cxt, enum event ev)
       mode_init(cxt->mono_cxt);
       break;
     case EVENT_NOTE_ON:
-      if (is_for_me(cxt->mono_cxt->settings->midi_channel, cxt->channel)) {
-        mode_note_on(cxt->mono_cxt, cxt->note, cxt->channel);
-      }
+      mode_note_on(cxt->mono_cxt, cxt->note, cxt->channel);
       break;
     case EVENT_NOTE_OFF:
-      if (is_for_me(cxt->mono_cxt->settings->midi_channel, cxt->channel)) {
-        mode_note_off(cxt->mono_cxt, cxt->note, cxt->channel);
-      }
+      mode_note_off(cxt->mono_cxt, cxt->note, cxt->channel);
       break;
     case EVENT_RT_CLOCK:
       mode_clock(cxt->mono_cxt);
