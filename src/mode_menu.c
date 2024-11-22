@@ -55,9 +55,10 @@ static void mode_init(mode_menu_t *cxt)
 {
   cxt->menu_index = cxt->settings->mode_prev;
   cxt->blink_leds_on = true;
-  cxt->timer.period_ms = 500;
+  cxt->timer.period_ms = 250;
   cxt->timer.timer_callback = timer_callback;
   cxt->timer.callback_data = cxt;
+  timer_start(&cxt->timer);
 }
 
 static void mode_note_on(mode_menu_t *cxt, uint8_t note)
