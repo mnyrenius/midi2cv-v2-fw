@@ -60,3 +60,10 @@ void led_off(uint8_t index)
 
   PORTD &= ~_BV(pin);
 }
+
+void led_all_off(void)
+{
+  for (uint8_t i = 0; i < 5; ++i) {
+    led_off(i);
+  }
+}

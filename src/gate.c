@@ -60,3 +60,10 @@ void gate_off(uint8_t index)
 
   PORTC |= _BV(pin);
 }
+
+void gate_all_off(void)
+{
+  for (uint8_t i = 0; i < 5; ++i) {
+    gate_off(i);
+  }
+}

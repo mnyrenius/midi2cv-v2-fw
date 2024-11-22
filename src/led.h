@@ -6,5 +6,6 @@
 void led_init(void);
 void led_on(uint8_t index);
 void led_off(uint8_t index);
+void led_all_off(void);
 
 #endif /* LED_H */

@@ -5,6 +5,7 @@
 #include <util/delay.h>
 #include "constants.h"
 #include <string.h>
+#include "timer.h"
 
 /* Settings menu
 
@@ -37,10 +38,26 @@ static void update_leds(uint8_t mode)
   }
 }
 
+static void timer_callback(void *data)
+{
+  mode_menu_t *cxt = (mode_menu_t *)data;
+  if (cxt->blink_leds_on) {
+    update_leds(cxt->menu_index);
+    cxt->blink_leds_on = false;
+  }
+  else {
+    led_all_off();
+    cxt->blink_leds_on = true;
+  }
+}
+
 static void mode_init(mode_menu_t *cxt)
 {
   cxt->menu_index = cxt->settings->mode_prev;
-  update_leds(cxt->menu_index);
+  cxt->blink_leds_on = true;
+  cxt->timer.period_ms = 500;
+  cxt->timer.timer_callback = timer_callback;
+  cxt->timer.callback_data = cxt;
 }
 
 static void mode_note_on(mode_menu_t *cxt, uint8_t note)
@@ -49,16 +66,15 @@ static void mode_note_on(mode_menu_t *cxt, uint8_t note)
     case 0:
       if (cxt->menu_index > 0)
         cxt->menu_index--;
-      update_leds(cxt->menu_index);
       break;
     case 2:
       if (cxt->menu_index < 15)
         cxt->menu_index++;
-      update_leds(cxt->menu_index);
       break;
     case 4:
       cxt->settings->mode = cxt->menu_index;
       settings_write(cxt->settings);
+      timer_stop();
       __asm__("jmp 0"); // soft reset to reload settings
       break;
     default:
