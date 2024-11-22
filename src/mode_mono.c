@@ -93,7 +93,8 @@ void mode_mono_event(mode_t *cxt, enum event ev)
     case EVENT_RT_STOP:
       cxt->mono_cxt->clock_counter = 0;
       cxt->mono_cxt->clock_running = 0;
-      led_off(CLOCK_PIN);
+      gate_all_off();
+      led_all_off();
       break;
     default:
       break;
