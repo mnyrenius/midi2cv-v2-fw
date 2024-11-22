@@ -31,7 +31,7 @@ enum mode {
 
 typedef struct mode_t {
   void (*event)(struct mode_t*, enum event);
-  uint8_t channel, note, num_channels;
+  uint8_t channel, note;
   union {
     struct mode_unison_t *unison_cxt;
     struct mode_midilearn_t *midilearn_cxt;

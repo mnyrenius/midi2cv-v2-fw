@@ -102,11 +102,6 @@ bool should_enter_menu(midi2cv_t *cxt)
   return enter_menu;
 }
 
-bool is_midimsg_for_mode(uint8_t channel, uint8_t base_channel, uint8_t num_channels)
-{
-  return channel >= base_channel && channel < (base_channel + num_channels);
-}
-
 void note_on(void *arg, uint8_t channel, uint8_t note)
 {
   midi2cv_t * cxt = (midi2cv_t *)arg;
@@ -119,10 +114,10 @@ void note_on(void *arg, uint8_t channel, uint8_t note)
     cxt->settings.mode = MODE_MENU;
     settings_write(&cxt->settings);
     __asm__("jmp 0"); // soft reset to reload settings
-  } else if (is_midimsg_for_mode(channel, cxt->settings.midi_channel, m->num_channels)) {
-      m->channel = channel;
-      m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
-      m->event(m, EVENT_NOTE_ON);
+  } else {
+    m->channel = channel;
+    m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
+    m->event(m, EVENT_NOTE_ON);
   }
 }
 
@@ -135,11 +130,9 @@ void note_off(void *arg, uint8_t channel, uint8_t note)
   }
 
   mode_t *m = &cxt->modes[cxt->settings.mode];
-  if (is_midimsg_for_mode(channel, cxt->settings.midi_channel, m->num_channels)) {
-    m->channel = channel;
-    m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
-    m->event(m, EVENT_NOTE_OFF);
-  }
+  m->channel = channel;
+  m->note = note > cxt->settings.midi_base_note ? note - cxt->settings.midi_base_note : 0;
+  m->event(m, EVENT_NOTE_OFF);
 }
 
 void clock(void *arg)
@@ -231,16 +224,16 @@ int main()
     .retrig = 1,
   };
 
-  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_legato, .num_channels = 1 };
-  midi2cv.modes[MODE_UNISON_RETRIG]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_retrig, .num_channels = 1 };
-  midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn,     .num_channels = 1 };
-  midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing,        .num_channels = 1 };
-  midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_legato,   .num_channels = 1 };
-  midi2cv.modes[MODE_POLY_RETRIG]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_retrig,   .num_channels = 1 };
-  midi2cv.modes[MODE_SHARE]          = (mode_t) { .event = mode_share_event      , .share_cxt     = &mode_share,         .num_channels = 1 };
-  midi2cv.modes[MODE_MONO_LEGATO]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_legato,   .num_channels = 4 };
-  midi2cv.modes[MODE_MONO_RETRIG]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_retrig,   .num_channels = 4 };
-  midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu,          .num_channels = 1 };
+  midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_legato };
+  midi2cv.modes[MODE_UNISON_RETRIG]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_retrig };
+  midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn   };
+  midi2cv.modes[MODE_TURINGMACHINE]  = (mode_t) { .event = mode_turing_event     , .turing_cxt    = &mode_turing      };
+  midi2cv.modes[MODE_POLY_LEGATO]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_legato };
+  midi2cv.modes[MODE_POLY_RETRIG]    = (mode_t) { .event = mode_poly_event       , .poly_cxt      = &mode_poly_retrig };
+  midi2cv.modes[MODE_SHARE]          = (mode_t) { .event = mode_share_event      , .share_cxt     = &mode_share       };
+  midi2cv.modes[MODE_MONO_LEGATO]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_legato };
+  midi2cv.modes[MODE_MONO_RETRIG]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_retrig };
+  midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu        };
 
   generate_dac_values(midi2cv.dac_values);
   settings_read(&midi2cv.settings);
