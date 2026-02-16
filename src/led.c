@@ -61,9 +61,12 @@ void led_off(uint8_t index)
   PORTD &= ~_BV(pin);
 }
 
+void led_all_on(void)
+{
+  PORTD |= _BV(PD1 | PD2 | PD3 | PD4 | PD5);
+}
+
 void led_all_off(void)
 {
-  for (uint8_t i = 0; i < 5; ++i) {
-    led_off(i);
-  }
+  PORTD &= ~_BV(PD1 | PD2 | PD3 | PD4 | PD5);
 }
