@@ -23,7 +23,7 @@ static void mode_note_on(mode_duo_t *cxt, uint8_t note)
     if (cxt->current_base_note != 0xff) {
       uint8_t n = notemem_note_on(cxt->notemem, note);
       if (n < NUM_NOTES) {
-        if (cxt->retrig) {
+        if (cxt->settings->retrig) {
             gate_off(1);
         }
 

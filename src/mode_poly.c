@@ -20,7 +20,7 @@ static void mode_note_on(mode_poly_t *cxt, uint8_t note)
   if (note < NUM_NOTES) {
     if (cxt->next_channel < NUM_CHANNELS) {
       dac_write(cxt->next_channel, cxt->dac_values[note]);
-      if (cxt->retrig) {
+      if (cxt->settings->retrig) {
         for (uint8_t i = 0; i < cxt->next_channel; ++i) {
           gate_off(i);
         }

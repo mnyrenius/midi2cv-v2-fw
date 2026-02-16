@@ -26,7 +26,7 @@ static void mode_note_on(mode_mono_t *cxt, uint8_t note, uint8_t channel)
   if (note < NUM_NOTES) {
     uint8_t n = notemem_note_on(cxt->notemem, note);
     if (n < NUM_NOTES) {
-      if (cxt->retrig) {
+      if (cxt->settings->retrig) {
         gate_off(rel_channel);
       }
 

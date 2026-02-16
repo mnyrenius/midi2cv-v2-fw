@@ -10,6 +10,7 @@ typedef struct mode_menu_t {
   uint8_t menu_index;
   timer_t timer;
   bool blink_leds_on;
+  bool retrig;
 
 } mode_menu_t;
 

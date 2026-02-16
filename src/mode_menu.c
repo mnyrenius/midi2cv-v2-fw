@@ -11,22 +11,20 @@
 
   Gate leds forms a binary number 1-15 that represent a mode (top led = MSB).
 
-   1 - Unison, legato, note prio last
-   2 - Unison, retrig, note prio last
-   3 - Midi learn
-   4 - Turing machine
-   5 - Polyphonic, legato
-   6 - Polyphonic, retrig
-   7 - Unison/share, legato
-   8 - Mono, legato, 4 channels
-   9 - Mono, retrig, 4 channels
+   1 - Mono, 4 channels
+   2 - Duo, 2 channels
+   3 - Polyphonic
+   4 - Share
+   5 - Unison, legato, note prio last
+   6 - Turing machine
+   7 - Midi learn
   15 - Menu
 
 */
 
-static void update_leds(uint8_t mode)
+static void update_leds(mode_menu_t *cxt)
 {
-  mode++;
+  uint8_t mode = cxt->menu_index + 1;
 
   uint8_t mask = 0x01;
   for (uint8_t i = 0; i < NUM_CHANNELS; ++i) {
@@ -36,13 +34,16 @@ static void update_leds(uint8_t mode)
       led_off(i);
     mask <<= 1;
   }
+  if (cxt->retrig) {
+    led_on(4);
+  }
 }
 
 static void timer_callback(void *data)
 {
   mode_menu_t *cxt = (mode_menu_t *)data;
   if (cxt->blink_leds_on) {
-    update_leds(cxt->menu_index);
+    update_leds(cxt);
     cxt->blink_leds_on = false;
   }
   else {
@@ -58,6 +59,7 @@ static void mode_init(mode_menu_t *cxt)
   cxt->timer.period_ms = 250;
   cxt->timer.timer_callback = timer_callback;
   cxt->timer.callback_data = cxt;
+  cxt->retrig = false;
   timer_start(&cxt->timer);
 }
 
@@ -74,10 +76,14 @@ static void mode_note_on(mode_menu_t *cxt, uint8_t note)
       break;
     case 4:
       cxt->settings->mode = cxt->menu_index;
+      cxt->settings->retrig = cxt->retrig;
       settings_write(cxt->settings);
       timer_stop();
       __asm__("jmp 0"); // soft reset to reload settings
       break;
+    case 5:
+      cxt->retrig = !cxt->retrig;
+    break;
     default:
       break;
   }

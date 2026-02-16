@@ -18,10 +18,13 @@ void settings_read(settings_t *s)
       s->mode = 0;
     if (s->midi_base_note > 195)
       s->midi_base_note = 0;
+    if (s->retrig > 1)
+      s->retrig = 0;
   } else {
     s->midi_channel = 0;
     s->mode = 0;
     s->midi_base_note = 0;
+    s->retrig = 0;
   }
 }
 
