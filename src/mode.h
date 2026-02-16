@@ -25,6 +25,8 @@ enum mode {
   MODE_SHARE,
   MODE_MONO_LEGATO,
   MODE_MONO_RETRIG,
+  MODE_DUO_LEGATO,
+  MODE_DUO_RETRIG,
   MODE_MENU,
   MODE_END
 };
@@ -40,6 +42,7 @@ typedef struct mode_t {
     struct mode_poly_t *poly_cxt;
     struct mode_share_t *share_cxt;
     struct mode_mono_t *mono_cxt;
+    struct mode_duo_t *duo_cxt;
   };
 } mode_t;
 

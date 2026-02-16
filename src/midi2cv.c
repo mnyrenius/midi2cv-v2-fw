@@ -19,6 +19,7 @@
 #include "mode_poly.h"
 #include "mode_share.h"
 #include "mode_mono.h"
+#include "mode_duo.h"
 #include "constants.h"
 
 /* ---------- PIN CONFIGURATION ----------
@@ -224,6 +225,20 @@ int main()
     .retrig = 1,
   };
 
+  mode_duo_t mode_duo_legato = {
+      .settings = &midi2cv.settings,
+      .notemem = &midi2cv.notemem,
+      .dac_values = midi2cv.dac_values,
+      .retrig = 0,
+  };
+
+  mode_duo_t mode_duo_retrig = {
+    .settings = &midi2cv.settings,
+    .notemem = &midi2cv.notemem,
+    .dac_values = midi2cv.dac_values,
+    .retrig = 1,
+  };
+
   midi2cv.modes[MODE_UNISON_LEGATO]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_legato };
   midi2cv.modes[MODE_UNISON_RETRIG]  = (mode_t) { .event = mode_unison_event     , .unison_cxt    = &mode_unison_retrig };
   midi2cv.modes[MODE_MIDI_LEARN]     = (mode_t) { .event = mode_midilearn_event  , .midilearn_cxt = &mode_midilearn   };
@@ -233,6 +248,8 @@ int main()
   midi2cv.modes[MODE_SHARE]          = (mode_t) { .event = mode_share_event      , .share_cxt     = &mode_share       };
   midi2cv.modes[MODE_MONO_LEGATO]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_legato };
   midi2cv.modes[MODE_MONO_RETRIG]    = (mode_t) { .event = mode_mono_event       , .mono_cxt      = &mode_mono_retrig };
+  midi2cv.modes[MODE_DUO_LEGATO]     = (mode_t) { .event = mode_duo_event        , .duo_cxt       = &mode_duo_legato };
+  midi2cv.modes[MODE_DUO_RETRIG]     = (mode_t) { .event = mode_duo_event        , .duo_cxt       = &mode_duo_retrig };
   midi2cv.modes[MODE_MENU]           = (mode_t) { .event = mode_menu_event       , .menu_cxt      = &mode_menu        };
 
   generate_dac_values(midi2cv.dac_values);

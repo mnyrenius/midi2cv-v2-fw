@@ -120,4 +120,3 @@ uint8_t notemem_note_off(notemem_t *nm, uint8_t note)
 
   return res;
 }
-
