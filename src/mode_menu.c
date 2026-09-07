@@ -71,7 +71,7 @@ static void mode_note_on(mode_menu_t *cxt, uint8_t note)
         cxt->menu_index--;
       break;
     case 2:
-      if (cxt->menu_index < 15)
+      if (cxt->menu_index < (MODE_END - 1))
         cxt->menu_index++;
       break;
     case 4:

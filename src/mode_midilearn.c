@@ -32,6 +32,8 @@ static void mode_note_on(mode_midilearn_t *cxt, uint8_t channel, uint8_t note)
     cxt->settings->mode = MODE_MONO; // Jump to, let's call it, default mode
     cxt->settings->retrig = 0;
     settings_write(cxt->settings);
+    timer_stop();
+    __asm__("jmp 0"); // soft reset to reload settings
   }
 }
 
